@@ -5,7 +5,6 @@ from google import genai
 from dotenv import load_dotenv
 from prompt import base_prompt
 
-
 load_dotenv()
 gemini_token = os.getenv('GEMINI_TOKEN')
 client = genai.Client(api_key=gemini_token)
@@ -29,6 +28,7 @@ def select_file():
         global selected_file_path
         selected_file_path = file_path
 
+
 def execute_logic(file_path, mode, language):
     """
     Main execution logic
@@ -48,18 +48,21 @@ def execute_logic(file_path, mode, language):
     language_path = {
         "Traditional Chinese (Taiwan)": "cht",
         "English": "en",
-        "Japanese": "jp"
+        "Japanese": "jp",
+        "Russian": "ru",
+        "Indonesian": "id",
+        "Korean": "ko"
     }
 
     # Check if target file is existed
     target_file_path = file_path.replace(r"/zh/", f"/{language_path[language]}/")
     target_file_exist = os.path.exists(target_file_path)
     print(f"{target_file_path} exist: {target_file_exist}")
-    if target_file_exist and mode=="generator":
+    if target_file_exist and mode == "generator":
         print(f"{target_file_path} already exist, cannot use generator.")
         result_label.config(text=f"{target_file_path} already exist, cannot use generator.")
         return None
-    elif not target_file_exist and mode=="updater":
+    elif not target_file_exist and mode == "updater":
         print(f"{target_file_path} not exist, cannot use updater.")
         result_label.config(text=f"{target_file_path} not exist, cannot use updater.")
         return None
@@ -105,6 +108,7 @@ def execute():
     else:
         file_label.config(text="Please pick a file")
 
+
 root = tk.Tk()
 root.title("Snap Hutao Docs Translator")
 root.geometry("400x400")
@@ -124,7 +128,9 @@ mode_dropdown.pack()
 language_var = tk.StringVar(value="Traditional Chinese (Taiwan)")
 language_label = tk.Label(root, text="Target Language:")
 language_label.pack()
-language_dropdown = ttk.Combobox(root, textvariable=language_var, values=["Traditional Chinese (Taiwan)", "English", "Japanese"], state="readonly")
+language_dropdown = ttk.Combobox(root, textvariable=language_var,
+                                 values=["Traditional Chinese (Taiwan)", "English", "Japanese",
+                                         "Russian", "Indonesian", "Korean"], state="readonly")
 language_dropdown.pack()
 
 execute_button = tk.Button(root, text="Translate", command=execute)
