@@ -12,7 +12,7 @@ client = genai.Client(api_key=gemini_token)
 
 def translate(prompt: str) -> str:
     response = client.models.generate_content(
-        model='gemini-2.0-flash-exp', contents=prompt
+        model='gemini-2.5-flash-preview-05-20', contents=prompt
     )
     return response.text
 
@@ -103,8 +103,14 @@ def execute_logic(file_path, mode, language):
 def execute():
     if selected_file_path:
         selected_mode = mode_var.get()
-        selected_language = language_var.get()
-        execute_logic(selected_file_path, selected_mode, selected_language)
+        # Get all selected languages
+        selected_indices = language_listbox.curselection()
+        if not selected_indices:
+            result_label.config(text="Please select one or more languages")
+            return
+        selected_languages = [language_listbox.get(i) for i in selected_indices]
+        for language in selected_languages:
+            execute_logic(selected_file_path, selected_mode, language)
     else:
         file_label.config(text="Please pick a file")
 
@@ -125,13 +131,13 @@ mode_label.pack()
 mode_dropdown = ttk.Combobox(root, textvariable=mode_var, values=["Generator", "Updater"], state="readonly")
 mode_dropdown.pack()
 
-language_var = tk.StringVar(value="Traditional Chinese (Taiwan)")
-language_label = tk.Label(root, text="Target Language:")
+language_label = tk.Label(root, text="Select Target Language(s):")
 language_label.pack()
-language_dropdown = ttk.Combobox(root, textvariable=language_var,
-                                 values=["Traditional Chinese (Taiwan)", "English", "Japanese",
-                                         "Russian", "Indonesian", "Korean"], state="readonly")
-language_dropdown.pack()
+language_listbox = tk.Listbox(root, selectmode="multiple", height=6, exportselection=0)
+for lang in ["Traditional Chinese (Taiwan)", "English", "Japanese", "Russian", "Indonesian", "Korean"]:
+    language_listbox.insert(tk.END, lang)
+language_listbox.select_set(0)  # select default
+language_listbox.pack()
 
 execute_button = tk.Button(root, text="Translate", command=execute)
 execute_button.pack(pady=20)
